@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Netflix Logo Intro</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    html, body {
+      height: 100%;
+      background-color: #141414;
+      overflow: hidden;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-family: 'Netflix Sans', Arial, sans-serif;
+    }
+
+    #logo-intro {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100vw;
+      height: 100vh;
+      background-color: #141414;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+      animation: fadeOut 1s ease forwards;
+      animation-delay: 5.5s;
+    }
+
+    .netflix-n {
+      position: relative;
+      width: 140px;
+      height: 200px;
+      margin-bottom: 25px;
+      filter: drop-shadow(0 0 3px rgba(229, 9, 20, 0.8));
+    }
+
+    .left-bar,
+    .right-bar {
+      position: absolute;
+      top: 0;
+      width: 40px;
+      height: 200px;
+      background-color: #E50914;
+      opacity: 0;
+    }
+
+    .left-bar {
+      left: 0;
+      animation: slideInLeft 3s forwards;
+    }
+
+    .right-bar {
+      right: 0;
+      animation: slideInRight 3s forwards;
+    }
+
+    .middle-bar {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 140px;
+      height: 200px;
+      background-color: #E50914;
+      clip-path: polygon(28% 0%, 43% 0%, 72% 100%, 57% 100%);
+      opacity: 0;
+      animation: fadeInMiddle 1s ease forwards;
+      animation-delay: 2.5s;
+    }
+
+    .netflix-text {
+      color: #E50914;
+      font-weight: 700;
+      font-size: 3.5rem;
+      letter-spacing: 6px;
+      opacity: 0;
+      transform: scale(0.7);
+      animation: fadeInPop 1s forwards;
+      animation-delay: 3.5s;
+      user-select: none;
+    }
+
+    @keyframes slideInLeft {
+      0% {
+        transform: translateX(-150%) skewX(-20deg);
+        opacity: 0;
+      }
+      100% {
+        transform: translateX(0) skewX(0);
+        opacity: 1;
+      }
+    }
+
+    @keyframes slideInRight {
+      0% {
+        transform: translateX(150%) skewX(20deg);
+        opacity: 0;
+      }
+      100% {
+        transform: translateX(0) skewX(0);
+        opacity: 1;
+      }
+    }
+
+    @keyframes fadeInMiddle {
+      to {
+        opacity: 1;
+      }
+    }
+
+    @keyframes fadeInPop {
+      to {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+
+    @keyframes fadeOut {
+      to {
+        opacity: 0;
+        visibility: hidden;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div id="logo-intro">
+    <div class="netflix-n">
+      <div class="left-bar"></div>
+      <div class="middle-bar"></div>
+      <div class="right-bar"></div>
+    </div>
+    <div class="netflix-text">NETFLIX</div>
+  </div>
+
+  <script>
+    // Redirect to login page after 6.5 seconds
+    setTimeout(() => {
+      window.location.href = "login.html"; // 🔁 Replace with your actual login page file name
+    }, 6500);
+  </script>
+</body>
+</html>

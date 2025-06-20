@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Netflix Home</title>
+  <link rel="stylesheet" href="netflix.css" />
+  <style>
+    .profile-container {
+      position: relative;
+      display: inline-block;
+    }
+    .profile-icon {
+      width: 32px;
+      height: 32px;
+      cursor: pointer;
+      border-radius: 50%;
+      background-color: #e50914;
+      padding: 4px;
+    }
+    .watchlater-icon, .recommend-icon {
+      width: 32px;
+      height: 32px;
+      cursor: pointer;
+      border-radius: 50%;
+      background-color: #ccc;
+      padding: 4px;
+    }
+    .dropdown-menu {
+      display: none;
+      position: absolute;
+      right: 0;
+      top: 40px;
+      background-color: white;
+      border: 1px solid #ccc;
+      min-width: 120px;
+      z-index: 1000;
+      border-radius: 4px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    }
+    .dropdown-menu a {
+      display: block;
+      padding: 8px 12px;
+      text-decoration: none;
+      color: black;
+    }
+    .dropdown-menu a:hover {
+      background-color: #eee;
+    }
+    .watchlater-section, .recommend-section {
+      margin: 40px 20px;
+    }
+    .watchlater-section h2, .recommend-section h2 {
+      margin-bottom: 15px;
+    }
+    .watchlater-grid, .recommend-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    .movie-grid, .watchlater-grid, .recommend-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    .movie-grid .movie-item, .watchlater-grid .movie-item, .recommend-grid .movie-item {
+      position: relative;
+      width: 180px;
+      height: 252px;
+    }
+    .movie-grid img, .watchlater-grid img, .recommend-grid img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.2s ease-in-out;
+    }
+    .movie-grid .movie-item:hover img, .watchlater-grid .movie-item:hover img, .recommend-grid .movie-item:hover img {
+      transform: scale(1.1);
+      cursor: pointer;
+    }
+    .movie-item .play-button {
+      display: none;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background-color: rgba(229, 9, 20, 0.8);
+      color: white;
+      border: none;
+      border-radius: 50%;
+      width: 48px;
+      height: 48px;
+      font-size: 24px;
+      line-height: 48px;
+      text-align: center;
+      cursor: pointer;
+      z-index: 10;
+    }
+    .movie-item:hover .play-button {
+      display: block;
+    }
+    .movie-item .play-button:hover {
+      background-color: #c40812;
+    }
+    .add-watchlater-button {
+      background-color: #e50914;
+      color: white;
+      padding: 6px 12px;
+      margin-top: 10px;
+      border: none;
+      cursor: pointer;
+      border-radius: 4px;
+    }
+    .add-watchlater-button:hover {
+      background-color: #c40812;
+    }
+    .remove-watchlater-button {
+      background-color: #ccc;
+      color: black;
+      padding: 6px 12px;
+      margin-top: 10px;
+      border: none;
+      cursor: pointer;
+      border-radius: 4px;
+    }
+    .remove-watchlater-button:hover {
+      background-color: #aaa;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <header class="home-header" style="display: flex; justify-content: space-between; align-items: center;">
+    <div style="display: flex; align-items: center;">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/0/08/Netflix_2015_logo.svg" class="home-logo" alt="Netflix Logo" />
+    </div>
+    <div style="display: flex; align-items: center; gap: 20px;">
+      <a href="index.html" class="logout-btn">Log Out</a>
+      <img src="https://th.bing.com/th/id/OIP.jMtJKQhg7YyrE1ax7A_7agHaHa?w=512&h=512&rs=1&pid=ImgDetMain" class="watchlater-icon" id="watchLaterIcon" title="Watch Later" />
+      <img src="https://cdn-icons-png.flaticon.com/512/1665/1665731.png" class="recommend-icon" id="recommendIcon" title="Recommendations" />
+      <div class="profile-container">
+        <img src="https://cdn-icons-png.flaticon.com/512/149/149071.png" alt="Profile" class="profile-icon" id="profileIcon" />
+        <div class="dropdown-menu" id="dropdownMenu">
+          <a href="#">My Profile</a>
+          <a href="index.html">Log Out</a>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <h1 class="home-title">Popular on Netflix</h1>
+
+    <!-- Search Bar -->
+    <div class="search-container">
+      <input type="text" id="searchInput" placeholder="Search movies..." aria-label="Search movies" />
+    </div>
+
+    <!-- Genre Filter Buttons -->
+    <div class="genre-buttons">
+      <button data-genre="all">All</button>
+      <button data-genre="action">Action</button>
+      <button data-genre="drama">Drama</button>
+      <button data-genre="comedy">Comedy</button>
+      <button data-genre="sci-fi">Sci-Fi</button>
+    </div>
+
+    <!-- Movie Grid -->
+    <div class="movie-grid">
+      <!-- Action -->
+      <div class="movie-item">
+        <img src="https://th.bing.com/th/id/OSK.AAAMxbIFrLN9jihC3jfcezDTuzXf02Ffw_Dhs49qPec?w=120&h=168&c=7&rs=1&qlt=80&o=6&dpr=1.3&pid=SANGAM" 
+          alt="Gabbar Singh" tabindex="0" data-genre="action" data-cast="Chris Evans, Scarlett Johansson" data-crew="Director: Joe Russo, Producer: Kevin Feige">
+        <button class="play-button">▶</button>
+      </div>
+      <div class="movie-item">
+        <img src="https://th.bing.com/th/id/OSK._4qxO9_njR_9gwJvN0Vri1BxBLe55IyU7OGq9JoiPMk?w=120&h=168&c=7&rs=1&qlt=80&o=6&dpr=1.3&pid=SANGAM" 
+          alt="julayi" tabindex="0" data-genre="action" data-cast="Tom Cruise, Rebecca Ferguson" data-crew="Director: Christopher McQuarrie, Producer: Don Granger">
+        <button class="play-button">▶</button>
+      </div>
+      <div class="movie-item">
+        <img src="https://th.bing.com/th/id/OSK.Jcw5HwNLVWtdLftSR6xTNgTQBNfKulbZptiC3JyiXyE?w=120&h=168&c=7&rs=1&qlt=80&o=6&dpr=1.3&pid=SANGAM" 
+          alt="Ramayya Vasthavayya" tabindex="0" data-genre="action" data-cast="Vin Diesel, Michelle Rodriguez" data-crew="Director: Justin Lin, Producer: Neal H. Moritz">
+        <button class="play-button">▶</button>
+      </div>
+      <div class="movie-item">
+        <img src="https://igimage.indiaglitz.com/telugu/gallery/movies/rrr2020/poster_rr01.jpg" alt="RRR" tabindex="0" data-crew="Director:Rajamouli Producer:DVV" data-cast="JR.NTR,Ramcharan,Alia Bhatt,Morivis">
+        <button class="play-button">▶</button>
+      </div>
+      <div class="movie-item">
+        <img src="https://th.bing.com/th/id/R.e02fc703dc65f1eb8bfe12c4cfab9b17?rik=wmC5LHxYfKA%2bvA&riu=http%3a%2f%2fwww.idlebrain.com%2fimages4%2fwp-52magadheera1024.jpg&ehk=V9iY0j9euB7rSeRJVhz753EIx6wYxV%2fMo6C%2fBVDJrrA%3d&risl=&pid=ImgRaw&r=0" tabindex="0" alt="Magadheera" data-cast="Ramcharan,Kajal,Sri Hari" data-crew="Director:Rajamouli,Producer:Reliance movies" data-genre="action">
+        <button class="play-button">▶</button>
+      </div>
+      <!-- Drama -->
+      <div class="movie-item">
+        <img src="https://th.bing.com/th/id/OIP.0OgrsyDiahQzRAo9EXkSHAHaLG?w=115&h=180&c=7&r=0&o=7&dpr=1.3&pid=1.7&rm=3" 
+          alt="Rama" tabindex="0" data-genre="drama" data-cast="Leonardo DiCaprio, Kate Winslet" data-crew="Director: James Cameron, Producer: Jon Landau">
+        <button class="play-button">▶</button>
+      </div>
+      <div class="movie-item">
+        <img src="https://th.bing.com/th/id/OIP.pIzDShhZrE7n31aXXnR0NQHaJH?w=121&h=183&c=7&r=0&o=7&dpr=1.3&pid=1.7&rm=3" 
+          alt="Guru" tabindex="0" data-genre="drama" data-cast="Tom Hanks, Robin Wright" data-crew="Director: Robert Zemeckis, Producer: Steve Starkey">
+        <button class="play-button">▶</button>
+      </div>
+      <div class="movie-item">
+        <img src="https://th.bing.com/th/id/OIP.5RiKYCcMQZdcnwsyqiNXjAHaEK?w=278&h=180&c=7&r=0&o=7&dpr=1.3&pid=1.7&rm=3" 
+          alt="F 3" tabindex="0" data-genre="drama" data-cast="Morgan Freeman, Tim Robbins" data-crew="Director: Frank Darabont, Producer: Niki Marvin">
+        <button class="play-button">▶</button>
+      </div>
+      <div class="movie-item">
+        <img src="https://wallpaperaccess.com/full/3947961.jpg" alt="Heart Attack" tabindex="0" data-genre="drama" data-cast="Nithin, Adha Sharma" data-crew="Director:Puri Jagannadh,Producer:Puri">
+        <button class="play-button">▶</button>
+      </div>
+      <!-- Comedy -->
+      <div class="movie-item">
+        <img src="https://filmyfocus.com/wp-content/uploads/2020/09/17-Sontham.jpg" 
+          alt="Sontham" tabindex="0" data-genre="comedy" data-cast="Rajendra Prasad, Sumanth Ashwin" data-crew="Director: Srikanth, Producer: Dil Raju">
+        <button class="play-button">▶</button>
+      </div>
+      <div class="movie-item">
+        <img src="https://th.bing.com/th/id/OIP.SXhmfpxqAxblLDabstT4JwAAAA?pid=ImgDet&w=184&h=245&c=7&dpr=1.3" 
+          alt="Kidnap" tabindex="0" data-genre="comedy" data-cast="Jim Carrey, Jeff Daniels" data-crew="Director: Peter Farrelly, Producer: Bobby Farrelly">
+        <button class="play-button">▶</button>
+      </div>
+      <div class="movie-item">
+        <img src="https://starsunfolded.com/wp-content/uploads/2018/01/Kick-Telugu-Movie-Poster1.jpg" 
+          alt="Kick" tabindex="0" data-genre="comedy" data-cast="Ravi Teja, Ileana D'Cruz" data-genre="comedy" data-crew="Director: Surender Reddy, Producer: R. R. Venkat">
+        <button class="play-button">▶</button>
+      </div>
+      <div class="movie-item">
+        <img src="https://igimage.indiaglitz.com/telugu/gallery/movies/swathimuthyam2022/poster.jpg" alt="Swathimuthyam" tabindex="0" data-crew="Director :venkat,Producer:Hassine" data-cast="Bellamkonda Suresh,Kajal">
+        <button class="play-button">▶</button>
+      </div>
+      <div class="movie-item">
+        <img src="https://igimage.indiaglitz.com/telugu/gallery/movies/jailer22/poster.jpg" alt="Jailer" data-genre="comedy" tabindex="0" data-cast="Rajinikanth,Ramya Krishna,Mrunalini" data-crew="Director:Nelson,Producer:Sun movies">
+        <button class="play-button">▶</button>
+      </div>
+      <div class="movie-item">
+        <img src="https://th.bing.com/th/id/OIP.8K-5d9k6xIYGg_QwTit_pQHaDf?w=341&h=165&c=7&r=0&o=7&dpr=1.3&pid=1.7&rm=3" alt="MAD" tabindex="0" data-genre="comedy" data-cast="Narne Nithin,Sangeeth Shobhan,Ram Nithin,Sri Gouri Priya Reddy,Ananathika Sanilkumar,Gopikaa Udyan" data-crew="Director:Kalyan Shankar,Producer:Geetha arts">
+        <button class="play-button">▶</button>
+      </div>
+      <!-- Sci-Fi -->
+      <div class="movie-item">
+        <img src="https://th.bing.com/th/id/OIP.ZQXDs_RA6ZaHb51sYNQkwAHaEK?w=320&h=180&c=7&r=0&o=7&dpr=1.3&pid=1.7&rm=3" 
+          alt="Eega" tabindex="0" data-genre="sci-fi" data-cast="Matthew McConaughey, Anne Hathaway" data-crew="Director: Christopher Nolan, Producer: Emma Thomas">
+        <button class="play-button">▶</button>
+      </div>
+      <div class="movie-item">
+        <img src="https://th.bing.com/th/id/OIP.0ck6VS1RxUoiVatKcQrt7gHaDj?w=342&h=167&c=7&r=0&o=7&dpr=1.3&pid=1.7&rm=3" 
+          alt="&th sense" tabindex="0" data-genre="sci-fi" data-cast="Chris Pratt, Jennifer Lawrence" data-crew="Director: Morten Tyldum, Producer: Neal H. Moritz">
+        <button class="play-button">▶</button>
+      </div>
+      <div class="movie-item">
+        <img src="https://th.bing.com/th/id/OIP.Xm9Dp6elKV9eJybHfK0qlAHaEK?w=295&h=180&c=7&r=0&o=7&dpr=1.3&pid=1.7&rm=3" 
+          alt="Dheera" tabindex="0" data-genre="sci-fi" data-cast="Keanu Reeves, Carrie-Anne Moss" data-crew="Director: Lana Wachowski, Producer: Joel Silver">
+        <button class="play-button">▶</button>
+      </div>
+      <div class="movie-item">
+        <img src="https://th.bing.com/th/id/OIP.DzeEbuyArF_Ds4V5aE14zQHaEK?w=303&h=180&c=7&r=0&o=7&dpr=1.3&pid=1.7&rm=3" tabindex="0" alt="Ghazi" data-crew="Director:Sankalp Reddy,Producer:Dil Raju" data-cast="Rana,Atul kulakarni,Tapsee">
+        <button class="play-button">▶</button>
+      </div>
+      <div class="movie-item">
+        <img src="https://th.bing.com/th/id/OIP.2S9KXKAJOdDtDHY2joAQbAHaJ4?w=136&h=180&c=7&r=0&o=7&dpr=1.3&pid=1.7&rm=3" alt="Anthariksham" tabindex="0" data-genre="sci-fi" data-crew="Director:Sankalp Reddy,Producer:Geetha arts" data-cast="Varun Tej,Lavanya Tripathi">
+        <button class="play-button">▶</button>
+      </div>
+    </div>
+
+    <!-- Watch Later Section -->
+    <div class="watchlater-section" id="watchLaterSection" style="display: none;">
+      <h2>Watch Later</h2>
+      <div class="watchlater-grid" id="watchLaterGrid"></div>
+    </div>
+
+    <!-- Recommendation Section -->
+    <div class="recommend-section" id="recommendSection">
+      <h2>Recommended for You</h2>
+      <div class="recommend-grid" id="recommendGrid"></div>
+    </div>
+  </main>
+
+  <!-- Modal -->
+  <div id="modal" class="modal" tabindex="-1" aria-hidden="true" role="dialog" aria-label="Movie preview">
+    <span class="close-btn" id="closeModal" aria-label="Close modal">×</span>
+    <div class="modal-box">
+      <img class="modal-content" id="modalImage" alt="">
+      <div class="modal-info">
+        <h2 id="modalTitle"></h2>
+        <p><strong>Cast:</strong> <span id="modalCast"></span></p>
+        <p><strong>Crew:</strong> <span id="modalCrew"></span></p>
+        <button class="play-button">▶ Play</button>
+        <button class="add-watchlater-button" id="addToWatchLater">+ Watch Later</button>
+        <button class="remove-watchlater-button" id="removeFromWatchLater" style="display: none;">Remove from Watch Later</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Script -->
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const modal = document.getElementById('modal');
+      const modalImage = document.getElementById('modalImage');
+      const modalTitle = document.getElementById('modalTitle');
+      const modalCast = document.getElementById('modalCast');
+      const modalCrew = document.getElementById('modalCrew');
+      const closeModal = document.getElementById('closeModal');
+      const movieImages = document.querySelectorAll('.movie-grid img');
+      const genreButtons = document.querySelectorAll('.genre-buttons button');
+      const searchInput = document.getElementById('searchInput');
+      const profileIcon = document.getElementById('profileIcon');
+      const dropdownMenu = document.getElementById('dropdownMenu');
+      const addToWatchLaterBtn = document.getElementById('addToWatchLater');
+      const removeFromWatchLaterBtn = document.getElementById('removeFromWatchLater');
+      const watchLaterGrid = document.getElementById('watchLaterGrid');
+      const watchLaterIcon = document.getElementById('watchLaterIcon');
+      const watchLaterSection = document.getElementById('watchLaterSection');
+      const recommendIcon = document.getElementById('recommendIcon');
+      const recommendSection = document.getElementById('recommendSection');
+      const recommendGrid = document.getElementById('recommendGrid');
+
+      let currentSelectedMovie = {};
+      let isWatchLaterModal = false;
+
+      // Populate Recommendation Section on Load
+      const populateRecommendations = () => {
+        try {
+          const recommendedMovies = [
+            {
+              src: "https://th.bing.com/th/id/OSK.AAAMxbIFrLN9jihC3jfcezDTuzXf02Ffw_Dhs49qPec?w=120&h=168&c=7&rs=1&qlt=80&o=6&dpr=1.3&pid=SANGAM",
+              title: "Gabbar Singh",
+              cast: "Chris Evans, Scarlett Johansson",
+              crew: "Director: Joe Russo, Producer: Kevin Feige"
+            },
+            {
+              src: "https://th.bing.com/th/id/OIP.0OgrsyDiahQzRAo9EXkSHAHaLG?w=115&h=180&c=7&r=0&o=7&dpr=1.3&pid=1.7&rm=3",
+              title: "Rama",
+              cast: "Leonardo DiCaprio, Kate Winslet",
+              crew: "Director: James Cameron, Producer: Jon Landau"
+            },
+            {
+              src: "https://th.bing.com/th/id/OIP.ZQXDs_RA6ZaHb51sYNQkwAHaEK?w=320&h=180&c=7&r=0&o=7&dpr=1.3&pid=1.7&rm=3",
+              title: "Eega",
+              cast: "Matthew McConaughey, Anne Hathaway",
+              crew: "Director: Christopher Nolan, Producer: Emma Thomas"
+            }
+          ];
+
+          recommendGrid.innerHTML = "";
+          if (recommendedMovies.length === 0) {
+            recommendGrid.innerHTML = "<p>No recommendations available.</p>";
+          } else {
+            recommendedMovies.forEach(movie => {
+              const movieItem = document.createElement('div');
+              movieItem.className = 'movie-item';
+              const img = document.createElement('img');
+              img.src = movie.src;
+              img.alt = movie.title;
+              img.title = movie.title;
+              img.tabIndex = 0;
+              const playButton = document.createElement('button');
+              playButton.className = 'play-button';
+              playButton.textContent = '▶';
+              movieItem.appendChild(img);
+              movieItem.appendChild(playButton);
+              img.addEventListener('click', () => {
+                modal.style.display = "flex";
+                modalImage.src = movie.src;
+                modalTitle.textContent = movie.title;
+                modalCast.textContent = movie.cast || "Not available";
+                modalCrew.textContent = movie.crew || "Not available";
+                modal.setAttribute('aria-hidden', 'false');
+                addToWatchLaterBtn.style.display = "inline-block";
+                removeFromWatchLaterBtn.style.display = "none";
+                currentSelectedMovie = movie;
+                isWatchLaterModal = false;
+              });
+              img.addEventListener('keydown', e => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault();
+                  img.click();
+                }
+              });
+              recommendGrid.appendChild(movieItem);
+            });
+          }
+        } catch (e) {
+          alert('Error loading Recommendations. Please try again.');
+        }
+      };
+
+      // Call populateRecommendations on page load
+      populateRecommendations();
+
+      // Open Modal for Movie Grid
+      movieImages.forEach(img => {
+        img.addEventListener('click', () => {
+          modal.style.display = "flex";
+          modalImage.src = img.src;
+          modalTitle.textContent = img.alt;
+          modalCast.textContent = img.dataset.cast || "Not available";
+          modalCrew.textContent = img.dataset.crew || "Not available";
+          modal.setAttribute('aria-hidden', 'false');
+          addToWatchLaterBtn.style.display = "inline-block";
+          removeFromWatchLaterBtn.style.display = "none";
+          currentSelectedMovie = {
+            src: img.src,
+            title: img.alt,
+            cast: img.dataset.cast || "Not available",
+            crew: img.dataset.crew || "Not available"
+          };
+          isWatchLaterModal = false;
+        });
+
+        img.addEventListener('keydown', e => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            img.click();
+          }
+        });
+      });
+
+      // Genre Filter
+      genreButtons.forEach(button => {
+        button.addEventListener('click', () => {
+          const selectedGenre = button.dataset.genre;
+          movieImages.forEach(img => {
+            img.parentElement.style.display = (selectedGenre === 'all' || img.dataset.genre === selectedGenre) ? 'inline-block' : 'none';
+          });
+        });
+      });
+
+      // Search
+      searchInput.addEventListener('input', () => {
+        const query = searchInput.value.toLowerCase();
+        movieImages.forEach(img => {
+          const title = img.alt.toLowerCase();
+          const cast = img.dataset.cast?.toLowerCase() || "";
+          const crew = img.dataset.crew?.toLowerCase() || "";
+          img.parentElement.style.display = (title.includes(query) || cast.includes(query) || crew.includes(query)) ? 'inline-block' : 'none';
+        });
+      });
+
+      // Close Modal
+      closeModal.addEventListener('click', () => {
+        modal.style.display = "none";
+        modal.setAttribute('aria-hidden', 'true');
+        modalImage.src = "";
+        modalTitle.textContent = "";
+        modalCast.textContent = "";
+        modalCrew.textContent = "";
+        addToWatchLaterBtn.style.display = "inline-block";
+        removeFromWatchLaterBtn.style.display = "none";
+      });
+
+      modal.addEventListener('click', e => {
+        if (e.target === modal) closeModal.click();
+      });
+
+      window.addEventListener('keydown', e => {
+        if (e.key === 'Escape' && modal.style.display === 'flex') closeModal.click();
+      });
+
+      // Profile Dropdown
+      profileIcon.addEventListener('click', (e) => {
+        e.stopPropagation();
+        dropdownMenu.style.display = dropdownMenu.style.display === 'block' ? 'none' : 'block';
+      });
+
+      document.addEventListener('click', (e) => {
+        if (!dropdownMenu.contains(e.target)) {
+          dropdownMenu.style.display = 'none';
+        }
+      });
+
+      // Add to Watch Later
+      addToWatchLaterBtn.addEventListener('click', () => {
+        try {
+          const list = JSON.parse(localStorage.getItem('watchLaterList')) || [];
+          const isDuplicate = list.some(item => item.src === currentSelectedMovie.src);
+          if (!isDuplicate) {
+            list.push(currentSelectedMovie);
+            localStorage.setItem('watchLaterList', JSON.stringify(list));
+            alert(`${currentSelectedMovie.title} added to Watch Later!`);
+          } else {
+            alert('Movie already in Watch Later!');
+          }
+        } catch (e) {
+          alert('Error saving to Watch Later. Please try again.');
+        }
+      });
+
+      // Remove from Watch Later
+      removeFromWatchLaterBtn.addEventListener('click', () => {
+        try {
+          const list = JSON.parse(localStorage.getItem('watchLaterList')) || [];
+          const updatedList = list.filter(item => item.src !== currentSelectedMovie.src);
+          localStorage.setItem('watchLaterList', JSON.stringify(updatedList));
+          alert(`${currentSelectedMovie.title} removed from Watch Later!`);
+          closeModal.click();
+          if (watchLaterSection.style.display === 'block') {
+            watchLaterIcon.click(); // Refresh the Watch Later grid
+          }
+        } catch (e) {
+          alert('Error removing from Watch Later. Please try again.');
+        }
+      });
+
+      // Toggle Watch Later Section
+      watchLaterIcon.addEventListener('click', () => {
+        try {
+          const list = JSON.parse(localStorage.getItem('watchLaterList')) || [];
+          watchLaterGrid.innerHTML = "";
+          if (list.length === 0) {
+            watchLaterGrid.innerHTML = "<p>No movies added yet.</p>";
+          } else {
+            list.forEach(movie => {
+              const movieItem = document.createElement('div');
+              movieItem.className = 'movie-item';
+              const img = document.createElement('img');
+              img.src = movie.src;
+              img.alt = movie.title;
+              img.title = movie.title;
+              img.tabIndex = 0;
+              const playButton = document.createElement('button');
+              playButton.className = 'play-button';
+              playButton.textContent = '▶';
+              movieItem.appendChild(img);
+              movieItem.appendChild(playButton);
+              img.addEventListener('click', () => {
+                modal.style.display = "flex";
+                modalImage.src = movie.src;
+                modalTitle.textContent = movie.title;
+                modalCast.textContent = movie.cast || "Not available";
+                modalCrew.textContent = movie.crew || "Not available";
+                modal.setAttribute('aria-hidden', 'false');
+                addToWatchLaterBtn.style.display = "none";
+                removeFromWatchLaterBtn.style.display = "inline-block";
+                currentSelectedMovie = movie;
+                isWatchLaterModal = true;
+              });
+              img.addEventListener('keydown', e => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault();
+                  img.click();
+                }
+              });
+              watchLaterGrid.appendChild(movieItem);
+            });
+          }
+          watchLaterSection.style.display = watchLaterSection.style.display === 'none' ? 'block' : 'none';
+          recommendSection.style.display = 'none'; // Hide recommendations when showing watch later
+          window.scrollTo(0, watchLaterSection.offsetTop);
+        } catch (e) {
+          alert('Error loading Watch Later list. Please try again.');
+        }
+      });
+
+      // Toggle Recommendation Section
+      recommendIcon.addEventListener('click', () => {
+        recommendSection.style.display = recommendSection.style.display === 'none' ? 'block' : 'none';
+        watchLaterSection.style.display = 'none'; // Hide watch later when showing recommendations
+        if (recommendSection.style.display === 'block') {
+          populateRecommendations(); // Refresh recommendations
+          window.scrollTo(0, recommendSection.offsetTop);
+        }
+      });
+    });
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Netflix Clone - Sign In</title>
+  <link rel="stylesheet" href="home.css" />
+  <style>
+    .toggle-link {
+      color: #fff;
+      text-decoration: underline;
+      cursor: pointer;
+      margin-top: 10px;
+      display: inline-block;
+    }
+    .toggle-link:hover {
+      color: #e50914;
+    }
+  </style>
+</head>
+<body>
+  <div class="hero">
+    <div class="overlay">
+      <header class="header">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/0/08/Netflix_2015_logo.svg" alt="Netflix Logo" class="logo">
+      </header>
+
+      <div class="hero-content">
+        <h1 id="form-title">Sign In</h1>
+        <p id="form-description">Use your email or phone number and password to sign in.</p>
+        
+        <form class="email-form" id="login-form">
+          <input type="text" placeholder="Email or Phone number" id="identifier" required>
+          <input type="password" placeholder="Password" id="password" required>
+          <div id="error-message" class="error"></div>
+          <button type="submit" id="submit-button">Sign In</button>
+        </form>
+        <span class="toggle-link" id="toggle-link">New to Netflix? Sign up now.</span>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const form = document.getElementById('login-form');
+    const identifier = document.getElementById('identifier');
+    const password = document.getElementById('password');
+    const errorMsg = document.getElementById('error-message');
+    const toggleLink = document.getElementById('toggle-link');
+    const formTitle = document.getElementById('form-title');
+    const formDescription = document.getElementById('form-description');
+    const submitButton = document.getElementById('submit-button');
+
+    let isSignUpMode = false;
+
+    // Toggle between Sign In and Sign Up
+    toggleLink.addEventListener('click', () => {
+      isSignUpMode = !isSignUpMode;
+      if (isSignUpMode) {
+        formTitle.textContent = 'Sign Up';
+        formDescription.textContent = 'Create an account with your email or phone number and password.';
+        submitButton.textContent = 'Sign Up';
+        toggleLink.textContent = 'Already have an account? Sign in now.';
+      } else {
+        formTitle.textContent = 'Sign In';
+        formDescription.textContent = 'Use your email or phone number and password to sign in.';
+        submitButton.textContent = 'Sign In';
+        toggleLink.textContent = 'New to Netflix? Sign up now.';
+      }
+      // Clear form and errors
+      identifier.value = '';
+      password.value = '';
+      errorMsg.textContent = '';
+      identifier.style.border = '';
+      password.style.border = '';
+    });
+
+    form.addEventListener('submit', function(e) {
+      e.preventDefault();
+      const idValue = identifier.value.trim();
+      const passValue = password.value.trim();
+
+      // Validation: email or 10-digit phone number
+      const emailPattern = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
+      const phonePattern = /^\d{10}$/;
+
+      // Validation: password (minimum 6 characters)
+      if (!emailPattern.test(idValue) && !phonePattern.test(idValue)) {
+        errorMsg.textContent = 'Please enter a valid email or 10-digit phone number.';
+        identifier.style.border = '1px solid red';
+        password.style.border = '';
+        return;
+      }
+
+      if (passValue.length < 6) {
+        errorMsg.textContent = 'Password must be at least 6 characters long.';
+        identifier.style.border = '';
+        password.style.border = '1px solid red';
+        return;
+      }
+
+      errorMsg.textContent = '';
+      identifier.style.border = '';
+      password.style.border = '';
+
+      // Handle Sign Up
+      if (isSignUpMode) {
+        try {
+          let users = JSON.parse(localStorage.getItem('netflixUsers')) || [];
+          const userExists = users.some(user => user.identifier === idValue);
+          if (userExists) {
+            errorMsg.textContent = 'This email or phone number is already registered.';
+            identifier.style.border = '1px solid red';
+            return;
+          }
+          users.push({ identifier: idValue, password: passValue });
+          localStorage.setItem('netflixUsers', JSON.stringify(users));
+          window.location.href = "webpage.html";
+        } catch (e) {
+          errorMsg.textContent = 'Error during sign up. Please try again.';
+        }
+      } else {
+        // Handle Sign In (accept any valid email/phone and password)
+        window.location.href = "webpage.html";
+      }
+    });
+  </script>
+</body>
+</html>
